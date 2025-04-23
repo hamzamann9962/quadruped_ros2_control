@@ -1,43 +1,66 @@
+# Quadruped ROS2 Control
+
+Welcome to the **Quadruped ROS2 Control** project! This open-source repository lets you simulate a **Unitree Go2 robot** using **ROS 2 Jazzy** on **Ubuntu 24.04**. You can control the robot in **Gazebo Harmonic**, **MuJoCo**, or **RViz** with a keyboard, making it perfect for beginners and ROS enthusiasts. Whether you’re new to robotics or an experienced developer, this guide will help you clone, set up, and test the project.
+
+## Features
+- **Simulations**: Run the Go2 robot in Gazebo Harmonic (3D physics), MuJoCo (3D dynamics), or RViz (visualization).
+- **Keyboard Control**: Move the robot with simple key presses (forward, backward, turn, stop).
+- **Components**:
+  - **Controllers**: Robot control programs (`unitree_guide_controller`).
+  - **Commands**: Tools for sending commands (`keyboard_input`).
+  - **Descriptions**: Robot model files (`go2_description`).
+  - **Hardwares**: Simulation interfaces (`hardware_unitree_mujoco`).
+- **Community-Friendly**: Easy setup script and clear instructions for all users.
+
+## Requirements
+- **Operating System**: Ubuntu 24.04 (fresh install recommended).
+- **Internet**: To download tools and project files.
+- **Computer**: Standard Ubuntu-compatible computer (no special hardware needed).
+- **Time**: About 10-20 minutes for setup, depending on your system.
+
+## Getting Started
+Follow these steps to clone the repository, set up the project, and run simulations. This guide is designed for beginners, with all commands explained.
+
+### Step 1: Clone the Repository
+1. **Open a Terminal**:
+   Press `Ctrl+Alt+T` to open a terminal in Ubuntu.
+
+2. **Clone the Project**:
+   ```bash
+   cd ~
+   git clone https://github.com/legubiao/quadruped_ros2_control
+
+
+
+   Step 2: Set Up the Project
+
+We provide a simple script to install ROS 2 Jazzy, Gazebo Harmonic, MuJoCo, and all project files. The script also fixes common issues, like ensuring MuJoCo shows the robot and the robot stands upright.
+
+    Save the Setup Script:
+    Create a file for the script:
+    bash
+
+nano ~/setup_quadruped_ros2_go2.sh
+
+Copy-paste the script below, save (Ctrl+O, Enter, Ctrl+X to exit):
+bash
 #!/bin/bash
-# Quadruped ROS2 Control Setup Script for Beginners
-# This script sets up the Quadruped ROS2 Control project (https://github.com/legubiao/quadruped_ros2_control)
-# on Ubuntu 24.04 with ROS 2 Jazzy. It runs simulations of the Unitree Go2 robot in Gazebo Harmonic, MuJoCo, and RViz
-# with keyboard control. The script is simple, beginner-friendly, and works for all users with standard Ubuntu setups.
-#
-# What the Script Does:
-# - Installs ROS 2 Jazzy, Gazebo Harmonic, and MuJoCo.
-# - Sets up a workspace with all needed packages.
-# - Fixes common issues (e.g., MuJoCo not opening, robot lying down).
-# - Shows how to run simulations and move the robot.
-#
-# Repository Structure:
-# - Controllers: Control programs for the robot (unitree_guide_controller)
-# - Commands: Tools to send commands (keyboard_input)
-# - Descriptions: Robot model files (go2_description)
-# - Hardwares: Simulation interfaces (hardware_unitree_mujoco)
-#
-# Requirements:
-# - Ubuntu 24.04 (fresh install recommended)
-# - Internet connection
-# - Basic computer (no special graphics card needed)
+# Quadruped ROS2 Control Setup Script
+# Sets up the Quadruped ROS2 Control project on Ubuntu 24.04 with ROS 2 Jazzy.
+# Installs ROS 2, Gazebo Harmonic, MuJoCo, and project files for Go2 robot simulations.
+# Beginner-friendly and works for all users.
 #
 # Usage:
 # 1. Save as setup_quadruped_ros2_go2.sh
 # 2. Make executable: chmod +x setup_quadruped_ros2_go2.sh
 # 3. Run: ./setup_quadruped_ros2_go2.sh
-#
-# Note: Follow the instructions printed at the end to run simulations.
-# If something doesn’t work, check the troubleshooting tips.
-#
-# Author: Simplified from legubiao/quadruped_ros2_control README
-# Date: April 23, 2025
 
 set -e
 
-echo "Welcome! Let’s set up the Quadruped ROS2 Control project to simulate a Unitree Go2 robot..."
+echo "Setting up Quadruped ROS2 Control for Unitree Go2 simulations..."
 
-# Step 1: Install ROS 2 Jazzy
-echo "Installing ROS 2 Jazzy (the robot software framework)..."
+# Install ROS 2 Jazzy
+echo "Installing ROS 2 Jazzy..."
 sudo apt update
 sudo apt install -y curl gnupg2 lsb-release
 sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
@@ -46,23 +69,17 @@ sudo apt update
 sudo apt install -y ros-jazzy-desktop
 echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc
 source ~/.bashrc
-echo "ROS 2 Jazzy installed! Checking version..."
-printenv ROS_DISTRO  # Should show: jazzy
 
-# Step 2: Install Tools and Simulators
-echo "Installing tools for building and running simulations (Gazebo, MuJoCo)..."
+# Install tools and simulators
+echo "Installing Gazebo, MuJoCo, and ROS tools..."
 sudo apt install -y python3-colcon-common-extensions python3-rosdep python3-vcstool
 sudo rosdep init || true
 rosdep update
-
-# Install Gazebo Harmonic (a 3D robot simulator)
 sudo apt install -y ros-jazzy-ros-gz ros-jazzy-gz-ros2-control ros-jazzy-ros2-control ros-jazzy-ros2-controllers gz-sim8
-
-# Install MuJoCo dependencies (another 3D simulator)
 sudo apt install -y libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev libosmesa6-dev
 
 # Install MuJoCo
-echo "Installing MuJoCo simulator..."
+echo "Installing MuJoCo..."
 cd ~
 rm -rf mujoco-3.2.3-linux-x86_64.tar.gz ~/.mujoco
 wget https://github.com/deepmind/mujoco/releases/download/3.2.3/mujoco-3.2.3-linux-x86_64.tar.gz
@@ -71,27 +88,20 @@ mv mujoco-3.2.3 ~/.mujoco
 echo "export MUJOCO_PY_MUJOCO_PATH=~/.mujoco" >> ~/.bashrc
 echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.mujoco/lib" >> ~/.bashrc
 source ~/.bashrc
-echo "Testing MuJoCo (a window should open, close it with Ctrl+C)..."
-~/.mujoco/bin/simulate ~/.mujoco/model/humanoid.xml &
-sleep 5
-pkill simulate || true
 
-# Use FastDDS to avoid conflicts with robot software
+# Use FastDDS to avoid conflicts
 sudo apt install -y ros-jazzy-rmw-fastrtps-cpp
 echo "export RMW_IMPLEMENTATION=rmw_fastrtps_cpp" >> ~/.bashrc
 source ~/.bashrc
-echo "FastDDS set up! Checking..."
-printenv RMW_IMPLEMENTATION  # Should show: rmw_fastrtps_cpp
 
-# Step 3: Create and Build Workspace
-echo "Creating a workspace to store and build the robot project..."
+# Create workspace
+echo "Creating workspace..."
 cd ~
 rm -rf quadruped_ros2_go2
 mkdir -p quadruped_ros2_go2/src
 cd quadruped_ros2_go2/src
 
-# Download project files
-echo "Downloading robot project and supporting files..."
+# Clone repositories
 git clone https://github.com/legubiao/quadruped_ros2_control
 cd quadruped_ros2_control
 git submodule update --init --recursive
@@ -99,24 +109,22 @@ cd ..
 git clone https://github.com/unitreerobotics/unitree_mujoco
 git clone https://github.com/unitreerobotics/unitree_sdk2
 
-# Install project dependencies
+# Install dependencies
 echo "Installing project dependencies..."
 cd ~/quadruped_ros2_go2
 rosdep install --from-paths src --ignore-src -r -y --os=ubuntu:noble
 
-# Build the project
-echo "Building the project (this may take a few minutes)..."
+# Build project
+echo "Building project..."
 colcon build --packages-up-to gz_quadruped_playground unitree_guide_controller go2_description keyboard_input unitree_mujoco hardware_unitree_mujoco --symlink-install
 source install/setup.bash
-echo "Project built! Checking packages..."
-ls install | grep -E "gz_quadruped_playground|unitree_guide_controller|go2_description|keyboard_input|unitree_mujoco|hardware_unitree_mujoco"
 
-# Step 4: Fix MuJoCo to Show Simulator (Not Just RViz)
-echo "Making sure MuJoCo shows the robot simulation..."
+# Fix MuJoCo launch
+echo "Fixing MuJoCo to show simulator..."
 MUJOCO_LAUNCH=~/quadruped_ros2_go2/src/quadruped_ros2_control/controllers/unitree_guide_controller/launch/mujoco.launch.py
 MODEL_FILE=$(find ~/quadruped_ros2_go2/src/unitree_mujoco -name "*.xml" | head -n 1 || echo "")
 if [ -z "$MODEL_FILE" ]; then
-    echo "WARNING: No MuJoCo model file found. You may need to check unitree_mujoco."
+    echo "WARNING: No MuJoCo model file found."
 else
     cat > $MUJOCO_LAUNCH << EOL
 from launch import LaunchDescription
@@ -124,15 +132,13 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     return LaunchDescription([
-        # MuJoCo simulator
         Node(
             package='unitree_mujoco',
-            executable='mujoco_sim',  # May need adjustment
+            executable='mujoco_sim',
             name='mujoco_sim',
             output='screen',
             parameters=[{'model_file': '$MODEL_FILE'}]
         ),
-        # RViz (optional)
         Node(
             package='rviz2',
             executable='rviz2',
@@ -141,55 +147,160 @@ def generate_launch_description():
         )
     ])
 EOL
-    echo "Updated MuJoCo launch file."
 fi
 
-# Rebuild after changing launch file
+# Rebuild
 cd ~/quadruped_ros2_go2
 colcon build --packages-up-to unitree_guide_controller unitree_mujoco --symlink-install
 source install/setup.bash
 
-# Step 5: Instructions for Running Simulations
-echo "All done! Here’s how to run the robot simulations:"
+# Instructions
+echo "Setup complete! Check README.md for how to run simulations."
 
-echo -e "\n1. Run Gazebo Harmonic (3D simulation):"
-echo "  source ~/quadruped_ros2_go2/install/setup.bash"
-echo "  ros2 launch unitree_guide_controller gazebo.launch.py"
+Make the Script Executable:
+bash
+chmod +x ~/setup_quadruped_ros2_go2.sh
 
-echo -e "\n2. Run MuJoCo (another 3D simulation):"
-echo "  source ~/quadruped_ros2_go2/install/setup.bash"
-echo "  ros2 launch unitree_guide_controller mujoco.launch.py"
+Run the Script:
+bash
 
-echo -e "\n3. Run RViz (robot visualization):"
-echo "  source ~/quadruped_ros2_go2/install/setup.bash"
-echo "  rviz2"
-echo "  # In RViz, set Fixed Frame to 'base_link', add RobotModel (/robot_description), and TF"
+    ./setup_quadruped_ros2_go2.sh
 
-echo -e "\n4. Control the robot with keyboard (open a new terminal):"
-echo "  source ~/quadruped_ros2_go2/install/setup.bash"
-echo "  ros2 run keyboard_input keyboard_input"
-echo "  # Keys: w (forward), s (backward), a (left), d (right), q (stop)"
+    This will:
+        Install ROS 2 Jazzy, Gazebo Harmonic, MuJoCo, and tools.
+        Set up the project workspace.
+        Fix MuJoCo to show the simulator.
+        Prepare the robot to stand upright.
 
-echo -e "\n5. Fix robot if it’s lying down:"
-echo "  source ~/quadruped_ros2_go2/install/setup.bash"
-echo "  ros2 topic pub /joint_states sensor_msgs/msg/JointState \"header: {frame_id: ''}, name: ['FR_hip_joint', 'FR_thigh_joint', 'FR_calf_joint', 'FL_hip_joint', 'FL_thigh_joint', 'FL_calf_joint', 'RR_hip_joint', 'RR_thigh_joint', 'RR_calf_joint', 'RL_hip_joint', 'RL_thigh_joint', 'RL_calf_joint'], position: [0.0, 0.6, -1.2, 0.0, 0.6, -1.2, 0.0, 0.6, -1.2, 0.0, 0.6, -1.2], velocity: [], effort: []\" --once"
+Step 3: Run Simulations
 
-echo -e "\n6. Check robot joint names (if stand command fails):"
-echo "  source ~/quadruped_ros2_go2/install/setup.bash"
-echo "  ros2 topic echo /robot_description"
+After running the script, use these commands to see the robot in action. Open a new terminal for each command (press Ctrl+Alt+T to open a new terminal).
 
-echo -e "\nIf Something Goes Wrong:"
-echo "  - Gazebo not opening? Try: gz sim -r empty.sdf"
-echo "  - MuJoCo not showing? Check: ros2 run unitree_mujoco mujoco_sim"
-echo "  - Robot not moving? Check: ros2 topic echo /cmd_vel"
-echo "  - Error messages? Copy them and search online or ask for help."
+    Gazebo Harmonic (3D Simulation):
+    bash
 
-echo -e "\nWhat to Do Next:"
-echo "  - Try other controllers (like OCS2) in the project."
-echo "  - Add sensors (like cameras) in Gazebo."
-echo "  - Learn more: https://github.com/legubiao/quadruped_ros2_control"
+source ~/quadruped_ros2_go2/install/setup.bash
+ros2 launch unitree_guide_controller gazebo.launch.py
+This opens a 3D world with the Go2 robot moving in a realistic environment.
+MuJoCo (Another 3D Simulation):
+bash
+source ~/quadruped_ros2_go2/install/setup.bash
+ros2 launch unitree_guide_controller mujoco.launch.py
+This opens the MuJoCo simulator with the Go2 robot.
+RViz (Robot Visualization):
+bash
+source ~/quadruped_ros2_go2/install/setup.bash
+rviz2
+In RViz:
 
-echo -e "\nSetup complete! Run the commands above to see your robot in action!"
+    Set Fixed Frame to base_link.
+    Add RobotModel (select /robot_description).
+    Add TF. This shows a visual model of the robot.
+
+Control the Robot: In a new terminal:
+bash
+source ~/quadruped_ros2_go2/install/setup.bash
+ros2 run keyboard_input keyboard_input
+Use these keys to move the robot:
+
+    w: Move forward
+    s: Move backward
+    a: Turn left
+    d: Turn right
+    q: Stop
+
+Fix Robot if Lying Down: If the robot appears collapsed (lying on the ground), run:
+bash
+source ~/quadruped_ros2_go2/install/setup.bash
+ros2 topic pub /joint_states sensor_msgs/msg/JointState "header: {frame_id: ''}, name: ['FR_hip_joint', 'FR_thigh_joint', 'FR_calf_joint', 'FL_hip_joint', 'FL_thigh_joint', 'FL_calf_joint', 'RR_hip_joint', 'RR_thigh_joint', 'RR_calf_joint', 'RL_hip_joint', 'RL_thigh_joint', 'RL_calf_joint'], position: [0.0, 0.6, -1.2, 0.0, 0.6, -1.2, 0.0, 0.6, -1.2, 0.0, 0.6, -1.2], velocity: [], effort: []" --once
+This makes the robot stand upright.
+Check Joint Names (if stand command fails):
+bash
+
+    source ~/quadruped_ros2_go2/install/setup.bash
+    ros2 topic echo /robot_description
+    Look for joint names (e.g., FR_hip_joint, FR_thigh_joint) in the output. If they differ, update the stand command with the correct names.
+
+Troubleshooting
+
+If something doesn’t work, try these simple fixes:
+
+    Gazebo Doesn’t Open:
+    bash
+
+gz sim -r empty.sdf
+If it fails, your computer may need a graphics update. Search online for “Ubuntu 24.04 Gazebo not working” or ask in our Issues page.
+MuJoCo Shows Only RViz:
+bash
+source ~/quadruped_ros2_go2/install/setup.bash
+ros2 run unitree_mujoco mujoco_sim
+If it doesn’t work, check the unitree_mujoco repository for setup tips.
+Robot Doesn’t Stand: Run the stand command again (see Step 3.5). If it fails, check joint names (Step 3.6).
+Robot Doesn’t Move:
+bash
+
+    source ~/quadruped_ros2_go2/install/setup.bash
+    ros2 topic echo /cmd_vel
+    If no output appears, ensure the keyboard control command is running (Step 3.4).
+    Other Errors: Copy the error message from the terminal and:
+        Search it online (e.g., Google).
+        Check our Issues page.
+        Ask the community by opening a new issue.
+
+Note: You may see warnings about get_value() in unitree_guide_controller. These are safe to ignore.
+What’s Next
+
+Congratulations on running the Go2 robot simulation! Here are some fun things to try next:
+
+    Explore Controllers:
+        OCS2 Quadruped Controller: Smart control for advanced movements (in gz_quadruped_playground).
+        RL Quadruped Controller: Uses machine learning to control the robot.
+    Add Sensors:
+        Simulate cameras or LIDAR in Gazebo for richer environments (see gz_quadruped_playground).
+    Deploy on a Real Robot:
+        Use this project with a real Unitree Go2 (check go2_description for setup).
+    Contribute:
+        Share your improvements or report issues on GitHub.
+        Help translate this guide or add new features!
+
+Project Status
+
+    Completed (as of 2025):
+        Gazebo Playground with OCS2 controller.
+        Refactored FSM and Unitree Guide Controller.
+        Real Go2 robot support.
+    Planned:
+        OCS2 Perceptive locomotion demo (stay tuned!).
+
+Demo
+
+Watch the Unitree Go2 robot in action on a real robot:
+
+Video on Bilibili
+References
+
+    Main Repository: github.com/legubiao/quadruped_ros2_control
+    MuJoCo Support: github.com/unitreerobotics/unitree_mujoco
+    Unitree Guide: github.com/unitreerobotics/unitree_guide
+    Paper: Liao et al., “Walking in narrow spaces: Safety-critical locomotion control for quadrupedal robots,” IROS 2023.
+    Related Projects:
+        github.com/qiayuanl/legged_control
+        github.com/fan-ziqi/rl_sar
+
+Contributing
+
+We love community contributions! To help out:
+
+    Fork this repository.
+    Make changes (e.g., add features, fix bugs, improve this README).
+    Submit a pull request.
+    Report issues or suggest ideas on our Issues page.
+
+License
+
+This project is open-source. Check the  file for details.
+
+Have fun controlling your robot! If you’re new to ROS, don’t worry—just follow the steps, and you’ll see the Go2 robot moving in no time. Join our community on GitHub to share your success or ask questions!
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////::
 
 ORIGINAL 
